@@ -5,63 +5,38 @@ import android.app.Activity
 import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.view.WindowManager
 import android.widget.FrameLayout
 import android.widget.ImageButton
 import android.widget.TextView
-import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowCompat
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
 import androidx.media3.common.AudioAttributes
 import androidx.media3.common.C
 import androidx.media3.common.MediaItem
+import androidx.media3.common.MediaMetadata
+import androidx.media3.common.MimeTypes
 import androidx.media3.common.PlaybackException
 import androidx.media3.common.Player
 import androidx.media3.common.Tracks
 import androidx.media3.common.VideoSize
 import androidx.media3.exoplayer.ExoPlayer
-import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
-import androidx.media3.session.MediaSession
 import androidx.media3.ui.AspectRatioFrameLayout
 import androidx.media3.ui.PlayerView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import dagger.hilt.android.AndroidEntryPoint
-import java.io.File
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.launch
-import timber.log.Timber
 import org.vlog.app.player.databinding.ActivityPlayerBinding
+import java.io.File
 
 @SuppressLint("UnsafeOptInUsageError")
-@AndroidEntryPoint
 class PlayerActivity : AppCompatActivity() {
 
     lateinit var binding: ActivityPlayerBinding
-
-    private var mediaSession: MediaSession? = null
-
     private var player: Player? = null
     private var dataUri: Uri? = null
     private var extras: Bundle? = null
-    private var playWhenReady = true
     private var isPlaybackFinished = false
-
-
-
-    var isFileLoaded = false
-    var isControlsLocked = false
-
-    private val playbackStateListener: Player.Listener = playbackStateListener()
-    private val trackSelector: DefaultTrackSelector by lazy {
-        DefaultTrackSelector(applicationContext)
-    }
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -69,23 +44,14 @@ class PlayerActivity : AppCompatActivity() {
         WindowCompat.setDecorFitsSystemWindows(window, false)
 
         // The window is always allowed to extend into the DisplayCutout areas on the short edges of the screen
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            window.attributes.layoutInDisplayCutoutMode =
-                WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
-        }
+        window.attributes.layoutInDisplayCutoutMode =
+            WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
 
         binding = ActivityPlayerBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         dataUri = intent.data
         extras = intent.extras
-
-        Timber.d("data: $dataUri")
-
-        dataUri?.let {  }
-
-
-
 
         val backButton =
             binding.playerView.findViewById<ImageButton>(R.id.back_button)
@@ -111,46 +77,7 @@ class PlayerActivity : AppCompatActivity() {
         if (extras?.containsKey(API_TITLE) == true) {
             videoTitleTextView.text = extras?.getString(API_TITLE)
         } else {
-            videoTitleTextView.text = dataUri?.let { "" }
-        }
-
-        // Collecting flows from view model
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                launch {
-
-                }
-
-                launch {
-
-                }
-
-                launch {
-
-                }
-
-                launch {
-
-                }
-            }
-        }
-
-
-
-        audioTrackButton.setOnClickListener {
-            val mappedTrackInfo = trackSelector.currentMappedTrackInfo ?: return@setOnClickListener
-
-            player?.let {
-
-            }
-        }
-
-        subtitleTrackButton.setOnClickListener {
-            val mappedTrackInfo = trackSelector.currentMappedTrackInfo ?: return@setOnClickListener
-
-            player?.let {
-
-            }
+            videoTitleTextView.text = dataUri?.let { File(dataUri.toString()).name }
         }
 
         nextButton.setOnClickListener {
@@ -162,8 +89,6 @@ class PlayerActivity : AppCompatActivity() {
             player?.seekToPrevious()
         }
         videoZoomButton.setOnClickListener {
-
-
             binding.playerView.resizeMode =
                 if (binding.playerView.resizeMode != AspectRatioFrameLayout.RESIZE_MODE_ZOOM) {
                     AspectRatioFrameLayout.RESIZE_MODE_ZOOM
@@ -174,12 +99,10 @@ class PlayerActivity : AppCompatActivity() {
         lockControlsButton.setOnClickListener {
             playerControls.visibility = View.INVISIBLE
             unlockControlsButton.visibility = View.VISIBLE
-            isControlsLocked = true
         }
         unlockControlsButton.setOnClickListener {
             unlockControlsButton.visibility = View.INVISIBLE
             playerControls.visibility = View.VISIBLE
-            isControlsLocked = false
         }
         backButton.setOnClickListener { finish() }
     }
@@ -190,23 +113,12 @@ class PlayerActivity : AppCompatActivity() {
     }
 
     override fun onStop() {
-
-
-        binding.gestureVolumeLayout.visibility = View.GONE
-        binding.gestureBrightnessLayout.visibility = View.GONE
         releasePlayer()
         super.onStop()
     }
 
     private fun initializePlayer() {
-        Timber.d("Initializing player")
 
-
-        trackSelector.setParameters(
-            trackSelector.buildUponParameters()
-                .setPreferredAudioLanguage("en")
-                .setPreferredTextLanguage("en")
-        )
         player = ExoPlayer.Builder(applicationContext)
             //.setRenderersFactory(renderersFactory)
             //.setTrackSelector(trackSelector)
@@ -218,7 +130,6 @@ class PlayerActivity : AppCompatActivity() {
                 /* handleAudioFocus = */ true
             ).build()
             .also { player ->
-
                 binding.playerView.player = player
                 binding.playerView.setControllerVisibilityListener(
                     PlayerView.ControllerVisibilityListener { visibility ->
@@ -226,28 +137,24 @@ class PlayerActivity : AppCompatActivity() {
                     }
                 )
 
+
+                val exoPlayerMediaItems: MutableList<MediaItem> = mutableListOf()
+                exoPlayerMediaItems.add(
+                    MediaItem.Builder().apply {
+                        setUri(dataUri)
+                        setMediaMetadata(MediaMetadata.Builder().setTitle("StorageMedia").build())
+                        setMimeType(MimeTypes.APPLICATION_SUBRIP)
+                    }.build()
+                )
+                player.setMediaItems(exoPlayerMediaItems)
+
                 player.setHandleAudioBecomingNoisy(true)
-                mediaSession = MediaSession.Builder(this, player).build()
-
-
-
-                player.playWhenReady = playWhenReady
-                player.addListener(playbackStateListener)
                 player.prepare()
             }
     }
 
     private fun releasePlayer() {
-        Timber.d("Releasing player")
-        player?.let { player ->
-            playWhenReady = player.playWhenReady
-
-            player.removeListener(playbackStateListener)
-            player.release()
-        }
-        mediaSession?.release()
         player = null
-        mediaSession = null
     }
 
     private fun playbackStateListener() = object : Player.Listener {
@@ -259,16 +166,10 @@ class PlayerActivity : AppCompatActivity() {
 
         @SuppressLint("SourceLockedOrientationActivity")
         override fun onVideoSizeChanged(videoSize: VideoSize) {
-            requestedOrientation = if (videoSize.isPortrait) {
-                ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT
-            } else {
-                ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
-            }
             super.onVideoSizeChanged(videoSize)
         }
 
         override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
-            Timber.d("Playing media item: ${mediaItem?.mediaId}")
             super.onMediaItemTransition(mediaItem, reason)
         }
 
@@ -285,7 +186,6 @@ class PlayerActivity : AppCompatActivity() {
         }
 
         override fun onPlayerError(error: PlaybackException) {
-            Timber.e(error)
             val alertDialog = MaterialAlertDialogBuilder(this@PlayerActivity)
                 .setTitle("error_playing_video")
                 .setMessage(error.message ?: "unknown_error")
@@ -306,10 +206,8 @@ class PlayerActivity : AppCompatActivity() {
         }
 
         override fun onPlaybackStateChanged(playbackState: Int) {
-            Timber.d("playback state changed: $playbackState")
             when (playbackState) {
                 Player.STATE_ENDED -> {
-                    Timber.d("Player state: ENDED")
                     isPlaybackFinished = true
                     if (player?.hasNextMediaItem() == true) {
                         player?.seekToNext()
@@ -319,16 +217,12 @@ class PlayerActivity : AppCompatActivity() {
                 }
 
                 Player.STATE_READY -> {
-                    Timber.d("Player state: READY")
-                    isFileLoaded = true
                 }
 
                 Player.STATE_BUFFERING -> {
-                    Timber.d("Player state: BUFFERING")
                 }
 
                 Player.STATE_IDLE -> {
-                    Timber.d("Player state: IDLE")
                 }
             }
             super.onPlaybackStateChanged(playbackState)
@@ -347,9 +241,9 @@ class PlayerActivity : AppCompatActivity() {
                     result.putExtra(API_POSITION, it.currentPosition.toInt())
                 }
             }
-            Timber.d("Sending result: $result")
             setResult(Activity.RESULT_OK, result)
         }
+
         super.finish()
     }
 
@@ -364,9 +258,3 @@ class PlayerActivity : AppCompatActivity() {
         const val API_SUBS_NAME = "subs.name"
     }
 }
-
-private val VideoSize.isPortrait: Boolean
-    get() {
-        val isRotated = this.unappliedRotationDegrees == 90 || this.unappliedRotationDegrees == 270
-        return if (isRotated) this.width > this.height else this.height > this.width
-    }

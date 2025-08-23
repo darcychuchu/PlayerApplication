@@ -1,8 +1,6 @@
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
-    alias(libs.plugins.ksp)
-    alias(libs.plugins.hilt)
 }
 
 android {
@@ -39,7 +37,6 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
-    implementation(libs.timber)
 
     implementation(libs.androidx.constraintlayout)
 
@@ -70,11 +67,6 @@ dependencies {
     implementation(libs.androidx.media3.exoplayer.smoothstreaming)
     implementation(libs.androidx.media3.exoplayer.rtsp)
 
-
-    // Hilt for dependency injection
-    implementation(libs.hilt.android)
-    implementation(libs.androidx.hilt.navigation.compose)
-    ksp(libs.hilt.compiler)
 
     implementation(project(":data"))
 }

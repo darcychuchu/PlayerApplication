@@ -8,6 +8,10 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -77,7 +81,7 @@ fun MainScreenWithBottomNavigation(
 					},
 					icon = {
 						Icon(
-							painter = painterResource(id = R.drawable.round_video_library_24),
+							painter = painterResource(id = R.drawable.folder_thumb),
 							contentDescription = stringResource(id = R.string.videos_layout)
 						)
 					}
@@ -94,7 +98,7 @@ fun MainScreenWithBottomNavigation(
 					},
 					icon = {
 						Icon(
-							painter = painterResource(id = R.drawable.round_folder_copy_24),
+							painter = painterResource(id = R.drawable.folder_thumb),
 							contentDescription = stringResource(id = R.string.folders_layout)
 						)
 					}
