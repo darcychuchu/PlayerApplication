@@ -74,8 +74,8 @@ class PlayerActivity : AppCompatActivity() {
                 WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
         }
 
-//        binding = ActivityPlayerBinding.inflate(layoutInflater)
-//        setContentView(binding.root)
+        binding = ActivityPlayerBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
         dataUri = intent.data
         extras = intent.extras

@@ -8,11 +8,11 @@ import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.AP
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
+import org.vlog.app.data.LocalMediaProvider
+import org.vlog.app.data.model.FolderItem
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
-import org.vlog.app.data.LocalMediaProvider
-import org.vlog.app.data.model.FolderItem
 
 class MainViewModel(
 	localMediaProvider: LocalMediaProvider
@@ -24,7 +24,7 @@ class MainViewModel(
 		emptyList()
 	)
 
-	private val _folderItemStateFlow = _videoItemsStateFlow.map { videoItemsList ->
+	private val _folderItemStateFlow = _videoItemsStateFlow.map{ videoItemsList ->
 
 		videoItemsList.map { videoItem ->
 			val splitPath = videoItem.absolutePath.split("/")

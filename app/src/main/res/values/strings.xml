@@ -1,3 +1,31 @@
 <resources>
     <string name="app_name">PlayerApplication</string>
+
+    <string name="empty_directory">空目录</string>
+    <string name="storage_removed">存储卡已被移除或卸载。</string>
+    <string name="choose_file">选择一个文件</string>
+    <string name="error_selecting_file">选择文件发生了错误</string>
+    <string name="internal_storage">内部存储</string>
+
+
+    <string name="title_choose">选择</string>
+    <string name="title_choose_dict_file">选择一个字典文件</string>
+    <string name="dialog_ok">选择</string>
+    <string name="dialog_cancel">取消</string>
+    <string name="option_create_folder">新建文件夹</string>
+    <string name="options_delete">删除</string>
+    <string name="new_folder_cancel">放弃</string>
+    <string name="new_folder_ok">确定</string>
+
+
+    <string name="videos_layout">All Videos</string>
+    <string name="folders_layout">Folders</string>
+    <string name="rotate_screen">Rotate Screen</string>
+    <string name="play_pause">Toggle Play Pause</string>
+    <string name="seek_backward">Seek Backward</string>
+    <string name="seek_forward">Seek Forward</string>
+    <string name="go_back">Go Back</string>
+    <string name="toggle_fitScreen">Toggle Fit Screen</string>
+    <string name="no_permission">Permission is not Granted!</string>
+    <string name="request_again">Request Again!</string>
 </resources>
