@@ -3,7 +3,6 @@ package org.vlog.app.player
 import android.content.pm.ActivityInfo
 import android.os.Bundle
 import android.widget.Toast
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -11,23 +10,11 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.selection.selectable
-import androidx.compose.foundation.selection.selectableGroup
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
 import androidx.compose.material3.adaptive.layout.AnimatedPane
@@ -35,9 +22,8 @@ import androidx.compose.material3.adaptive.layout.PaneAdaptedValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import kotlinx.coroutines.launch
-import org.vlog.app.ui.theme.PlayerApplicationTheme
-import org.vlog.app.ui.theme.spacing
 import androidx.compose.material3.adaptive.layout.SupportingPaneScaffold
+import androidx.compose.material3.adaptive.layout.ThreePaneScaffoldRole
 import androidx.compose.material3.adaptive.navigation.rememberSupportingPaneScaffoldNavigator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -45,8 +31,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.material3.adaptive.layout.AnimatedPane
-import androidx.compose.material3.adaptive.layout.ThreePaneScaffoldRole
 import org.vlog.app.player.VideoViewModel.Companion.LAYOUT_EXTRA
 import kotlin.getValue
 
@@ -57,7 +41,7 @@ class VideoActivity : AppCompatActivity(){
         enableEdgeToEdge()
 
         window.colorMode = ActivityInfo.COLOR_MODE_HDR
-        val compositionLayout = intent.getStringExtra(LAYOUT_EXTRA) ?: "layout"
+        val compositionLayout = intent.getStringExtra(LAYOUT_EXTRA) ?: "video_layout"
         val viewModel: VideoViewModel by viewModels {
             VideoViewModelFactory(application, compositionLayout)
         }
@@ -70,24 +54,38 @@ class VideoActivity : AppCompatActivity(){
         }
 
         setContent {
-            PlayerApplicationTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    val scope = rememberCoroutineScope()
-                    val navigator = rememberSupportingPaneScaffoldNavigator()
+            Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+                val scope = rememberCoroutineScope()
+                val navigator = rememberSupportingPaneScaffoldNavigator()
 
-                    BackHandler(navigator.canNavigateBack()) { scope.launch { navigator.navigateBack() } }
+                BackHandler(navigator.canNavigateBack()) { scope.launch { navigator.navigateBack() } }
 
-                    SupportingPaneScaffold(
-                        directive = navigator.scaffoldDirective,
-                        value = navigator.scaffoldValue,
-                        mainPane = {
-                        },
-                        supportingPane = {
-                        },
-                        modifier =Modifier.padding(innerPadding).padding(MaterialTheme.spacing.standard, MaterialTheme.spacing.small),
-                    )
-                }
-
+                SupportingPaneScaffold(
+                    directive = navigator.scaffoldDirective,
+                    value = navigator.scaffoldValue,
+                    mainPane = {
+                        AnimatedPane {
+                            CompositionPreviewPane(
+                                shouldShowSupportingPaneButton =
+                                    navigator.scaffoldValue.secondary == PaneAdaptedValue.Hidden,
+                                onNavigateToSupportingPane = {
+                                    scope.launch { navigator.navigateTo(ThreePaneScaffoldRole.Secondary) }
+                                },
+                                viewModel,
+                            )
+                        }
+                    },
+                    supportingPane = {
+                        AnimatedPane {
+                            ExportOptionsPane(
+                                viewModel,
+                                shouldShowBackButton = navigator.scaffoldValue.primary == PaneAdaptedValue.Hidden,
+                                onBack = { scope.launch { navigator.navigateBack() } },
+                            )
+                        }
+                    },
+                    modifier =Modifier.padding(innerPadding)
+                )
             }
         }
 
@@ -98,12 +96,13 @@ class VideoActivity : AppCompatActivity(){
     fun CompositionPreviewPane(
         shouldShowSupportingPaneButton: Boolean,
         onNavigateToSupportingPane: () -> Unit,
+        viewModel: VideoViewModel,
         modifier: Modifier = Modifier,
     ) {
         val scrollState = rememberScrollState()
         Column {
             Text(
-                text = "layout",
+                text = "Composition Preview Pane",
                 fontWeight = FontWeight.Bold,
             )
 
@@ -112,6 +111,7 @@ class VideoActivity : AppCompatActivity(){
 
     @Composable
     fun ExportOptionsPane(
+        viewModel: VideoViewModel,
         shouldShowBackButton: Boolean,
         onBack: () -> Unit,
         modifier: Modifier = Modifier,
@@ -119,10 +119,9 @@ class VideoActivity : AppCompatActivity(){
         var isAudioTypeExpanded by remember { mutableStateOf(false) }
         var isVideoTypeExpanded by remember { mutableStateOf(false) }
         Column(
-            verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.mini),
             modifier = modifier,
         ) {
-            Text(text = "export_settings", fontWeight = FontWeight.Bold)
+            Text(text = "Export Options Pane", fontWeight = FontWeight.Bold)
 
         }
     }

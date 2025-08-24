@@ -30,7 +30,7 @@ import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import com.google.accompanist.permissions.shouldShowRationale
-import org.vlog.app.player.PlayerActivity
+import org.vlog.app.player.VideoActivity
 import org.vlog.app.ui.theme.PlayerApplicationTheme
 
 class MainActivity : ComponentActivity() {
@@ -49,7 +49,7 @@ class MainActivity : ComponentActivity() {
                         onVideoItemClick = { videoItem ->
                             val playerIntent = Intent(
                                 this@MainActivity,
-                                PlayerActivity::class.java
+                                VideoActivity::class.java
                             ).apply{
                                 data = videoItem.uri
                             }

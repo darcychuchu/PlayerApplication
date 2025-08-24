@@ -28,9 +28,9 @@ android {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
-//    buildFeatures {
-//        viewBinding = true
-//    }
+    buildFeatures {
+        viewBinding = true
+    }
 }
 
 dependencies {
@@ -75,7 +75,6 @@ dependencies {
 
 
     implementation(project(":data"))
-    implementation(project(":app"))
     implementation(libs.checkerframework)
 }
 
