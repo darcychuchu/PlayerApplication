@@ -1,15 +1,32 @@
 package org.vlog.app.ui.theme
 
-import android.app.Activity
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.ReadOnlyComposable
+import androidx.compose.runtime.compositionLocalOf
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
+
+
+data class Spacing(val mini: Dp = 4.dp, val small: Dp = 8.dp, val standard: Dp = 16.dp)
+
+val LocalSpacing = compositionLocalOf { Spacing() }
+val MaterialTheme.spacing: Spacing
+    @Composable @ReadOnlyComposable get() = LocalSpacing.current
+
+@Composable
+fun Modifier.textPadding(): Modifier = this.padding(0.dp, 0.dp, MaterialTheme.spacing.small, 0.dp)
+
 
 private val DarkColorScheme = darkColorScheme(
     primary = Purple80,
@@ -40,6 +57,7 @@ fun PlayerApplicationTheme(
     dynamicColor: Boolean = true,
     content: @Composable () -> Unit
 ) {
+    val spacing = Spacing()
     val colorScheme = when {
         dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
             val context = LocalContext.current
@@ -50,9 +68,7 @@ fun PlayerApplicationTheme(
         else -> LightColorScheme
     }
 
-    MaterialTheme(
-        colorScheme = colorScheme,
-        typography = Typography,
-        content = content
-    )
+    CompositionLocalProvider(LocalSpacing provides spacing) {
+        MaterialTheme(colorScheme = colorScheme, typography = Typography, content = content)
+    }
 }
