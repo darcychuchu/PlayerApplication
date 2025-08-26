@@ -1,25 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="org.vlog.app.player">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.READ_MEDIA_VIDEO"/>
 
     <application
         android:usesCleartextTraffic="true">
         <activity
             android:name=".VideoActivity"
-            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout|uiMode|keyboard|keyboardHidden|navigation"
             android:exported="true"
             android:theme="@style/NextPlayer">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
-
                 <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-
-                <data android:scheme="file" />
-                <data android:scheme="content" />
-                <data android:scheme="http" />
-                <data android:scheme="https" />
-                <data android:host="*" />
-                <data android:mimeType="video/*" />
             </intent-filter>
         </activity>
     </application>
